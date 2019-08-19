@@ -73,15 +73,24 @@ let template = [
     label: 'feedly',
     submenu: [
       {
-        label: 'exit',
-        accelerator: 'CmdOrCtrl+W',
-        click: function () {
-          mainWindow.destroy()
+        label:'home',
+        accelerator: 'Alt+Home',
+        click:function () {
+          for(let childWindow of mainWindow.getChildWindows()){
+            childWindow.destroy()
+          }
+          mainWindow.loadURL('https://feedly.com/i/latest')
         }
       }, {
         label: 'minimize',
         accelerator: 'CmdOrCtrl+M',
         role: 'minimize'
+      }, {
+        label: 'exit',
+        accelerator: 'CmdOrCtrl+W',
+        click: function () {
+          mainWindow.destroy()
+        }
       }
     ]
   },
@@ -90,7 +99,7 @@ let template = [
     submenu: [
         { label: 'reload',
           accelerator: 'CmdOrCtrl+R',
-          click: function (item, focusedWindow) {
+          click: function (_, focusedWindow) {
           if (focusedWindow) {
             if (focusedWindow.id === 1) {
             BrowserWindow.getAllWindows().forEach(function (win) {
@@ -102,7 +111,21 @@ let template = [
             focusedWindow.reload()
           }
         }
+        },{
+      label:'go forward',
+        accelerator: 'Alt+Right',
+        click:function (_,focusedWindow) {
+          let contents = focusedWindow.webContents;
+          contents.goForward()
         }
+      },{
+        label:'go back',
+        accelerator: 'Alt+Left',
+        click:function (_,focusedWindow) {
+          let contents = focusedWindow.webContents;
+          contents.goBack()
+        }
+      }
         ]
   }, {
     label: 'about',
@@ -112,9 +135,15 @@ let template = [
         click: function (){
           shell.openExternal('https://github.com/Asutorufa/electron-feedly')
         }
-      }, {
+      },{
+      label: 'author: Asutorufa',
+        click: function () {
+          shell.openExternal('https://github.com/Asutorufa')
+        }
+      },{
         label: 'version: 1.0.0'
       }
+
     ]
   }
 ];
