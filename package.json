@@ -1,0 +1,40 @@
+{
+  "name": "feedly",
+  "version": "1.0.0",
+  "description": "organize, read and share what matters to you.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "repository": "https://github.com/electron/electron-quick-start",
+  "keywords": [
+    "feedly",
+    "Electron"
+  ],
+  "build": {
+    "appId": "com.asutorufa.electron-feedly",
+    "asar": true,
+    "files": [
+      "./build/**/*",
+      "./main.js"
+    ],
+    "linux": {
+      "category": "internet",
+      "packageCategory": "internet",
+      "icon": "build/icons",
+      "description": "feedly client",
+      "target": [
+        "AppImage"
+      ],
+      "maintainer": "asutorufa",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    }
+  },
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^3.0.7",
+    "electron-builder": "^21.2.0"
+  }
+}
