@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow,Menu, Tray} = require('electron');
+const {app, BrowserWindow,Menu, Tray,shell} = require('electron');
 const path = require('path');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -68,6 +68,57 @@ function createWindow () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
+let template = [
+  {
+    label: 'feedly',
+    submenu: [
+      {
+        label: 'exit',
+        accelerator: 'CmdOrCtrl+W',
+        click: function () {
+          mainWindow.destroy()
+        }
+      }, {
+        label: 'minimize',
+        accelerator: 'CmdOrCtrl+M',
+        role: 'minimize'
+      }
+    ]
+  },
+  {
+    label:'View',
+    submenu: [
+        { label: 'reload',
+          accelerator: 'CmdOrCtrl+R',
+          click: function (item, focusedWindow) {
+          if (focusedWindow) {
+            if (focusedWindow.id === 1) {
+            BrowserWindow.getAllWindows().forEach(function (win) {
+            if (win.id > 1) {
+              win.close()
+            }
+            })
+            }
+            focusedWindow.reload()
+          }
+        }
+        }
+        ]
+  }, {
+    label: 'about',
+    submenu: [
+      {
+        label: 'github',
+        click: function (){
+          shell.openExternal('https://github.com/Asutorufa/electron-feedly')
+        }
+      }, {
+        label: 'version: 1.0.0'
+      }
+    ]
+  }
+];
+
 let tray = null;
 app.on('ready', ()=>{
   tray = new Tray(path.join(__dirname, 'build/icons/feedly.png'));
@@ -78,6 +129,7 @@ app.on('ready', ()=>{
         if (!mainWindow.isVisible()) {
           mainWindow.show();
         }
+        mainWindow.focus()
       }
     }, {
       label: 'exit',
@@ -88,6 +140,8 @@ app.on('ready', ()=>{
   ]);
   tray.setToolTip('feedly');
   tray.setContextMenu(contextMenu);
+  let menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu)
 });
 app.on('ready',createWindow);
 
