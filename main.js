@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow,Menu, Tray,shell} = require('electron');
+const {app, BrowserWindow,Menu, Tray,shell,remote} = require('electron');
 const path = require('path');
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -24,21 +24,89 @@ function createWindow () {
   // and load the index.html of the app.
   // mainWindow.loadFile('index.html')
   mainWindow.loadURL('https://feedly.com/i/latest');
+  mainWindow.webContents.on("did-finish-load", function() {
+    mainWindow.webContents.insertCSS(`
+    /*- scrollbar -*/
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+::-webkit-scrollbar-thumb{
+    background-color: #999;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:vertical:hover{
+    background-color: #666;
+}
+::-webkit-scrollbar-thumb:vertical:active{
+    background-color: #333;
+}
+::-webkit-scrollbar-button{
+    display: none;
+}
+::-webkit-scrollbar-track{
+    background-color: #f1f1f1;
+}
+/*- scrollbar -*/`)
+  });
+
+  mainWindow.on('ready-to-show', () => {
+    mainWindow.show()
+  });
 
   // https://newsn.net/say/electron-browserwindow-size.html
-  // mainWindow.webContents.on('new-window',function(event, url, fname, disposition, options){
-  //   let childWindow = new BrowserWindow({
-  //     width:1100,
-  //     height:700,
-  //     // webPreferences: {
-  //     //   // preload: path.join(__dirname, 'preload.js'),
-  //     //   nodeIntegration:false
-  //     // },
-  //     // parent: mainWindow
-  //   });
-  //   childWindow.loadURL(url);
-  //   event.preventDefault();
-  // });
+//   mainWindow.webContents.on('new-window',function(event, url, fname, disposition, options){
+//     console.log(fname,url,disposition);
+//     if((!url.match("feedly.com\\/v3\\/auth\\/auth\\?client\\_id=feedly.*&mode=login")) && (!url.match("login-callback"))) {
+//       event.preventDefault();
+//       let childWindow = new BrowserWindow({
+//         width: 1100,
+//         height: 700,
+//         webContents: options.webContents, // use existing webContents if provided
+//         webPreferences: {
+//           preload: path.join(__dirname, 'preload.js'),
+//           nodeIntegration:false
+//         },
+//         parent: mainWindow
+//       });
+//       childWindow.once('ready-to-show', () => {
+//
+//         childWindow.show()
+//       });
+//       if (!options.webContents) {
+//         childWindow.loadURL(url) // existing webContents will be navigated automatically
+//       }
+//       childWindow.webContents.on("did-finish-load", ()=> {
+//         childWindow.webContents.insertCSS(`
+//     /*- scrollbar -*/
+// ::-webkit-scrollbar {
+//     width: 5px;
+//     height: 5px;
+// }
+// ::-webkit-scrollbar-thumb{
+//     background-color: #999;
+//     -webkit-border-radius: 5px;
+//     border-radius: 5px;
+// }
+// ::-webkit-scrollbar-thumb:vertical:hover{
+//     background-color: #666;
+// }
+// ::-webkit-scrollbar-thumb:vertical:active{
+//     background-color: #333;
+// }
+// ::-webkit-scrollbar-button{
+//     display: none;
+// }
+// ::-webkit-scrollbar-track{
+//     background-color: #f1f1f1;
+// }
+// /*- scrollbar -*/`)
+//       });
+//
+//       event.newGuest = childWindow;
+//     }
+//   });
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
