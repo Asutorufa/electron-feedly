@@ -13,11 +13,11 @@ function createWindow () {
     // frame: false,
     width: 1200,
     height: 700,
-    icon: path.join(__dirname, 'build/icons/')
-    // webPreferences: {
-    //   // preload: path.join(__dirname, 'preload.js'),
-    //   nodeIntegration: false
-    // }
+    icon: path.join(__dirname, 'build/icons/'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false
+    }
   });
 
 
