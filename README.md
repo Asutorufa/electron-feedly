@@ -1,2 +1,4 @@
 # electron-feedly
-a simple electron feedly client
+A simple electron feedly client ,just use electron to make feedly web like a client.
+
+![](https://raw.githubusercontent.com/Asutorufa/electron-feedly/master/proview.png)
