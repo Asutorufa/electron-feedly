@@ -25,24 +25,49 @@
     "linux": {
       "category": "Network",
       "packageCategory": "internet",
-      "icon": "build/icons",
       "description": "feedly client",
       "target": [
         "AppImage"
       ],
       "desktop": {
         "Name": "electronFeedly",
-        "Icon": "build/icons/feedly.svg",
         "Comment": "organize, read and share what matters to you."
       },
       "maintainer": "${author}"
+    },"mac": {
+      "icon": "build/icons/icon.png"
+    },
+    "win": {
+      "publish": [],
+      "icon": "build/icons/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        },
+        {
+          "target": "7z",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "multiLanguageInstaller": true
     },
     "artifactName": "${productName}-${version}-${arch}.${ext}"
   },
   "author": "asutorufa",
   "license": "BSD 2-Clause Simplified",
   "devDependencies": {
-    "electron": "^3.0.7",
+    "electron": "^6.0.3",
     "electron-builder": "^21.2.0"
   }
 }

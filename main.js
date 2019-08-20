@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow,Menu,MenuItem, Tray,shell,clipboard,dialog,Notification} = require('electron');
+const {app, BrowserWindow,Menu,Tray,shell,Notification} = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -7,38 +7,36 @@ const fs = require('fs');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-function createWindow(options) {
+function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     // transparent: true,
     // frame: false,
     width: 1200,
     height: 700,
-    icon: path.join(__dirname, 'build/icons/'),
+    icon: path.join(__dirname, 'build/icons/icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      // preload: path.join(__dirname,"./app/contextmenu.js"),
       nodeIntegration: true,
       nativeWindowOpen: true
     }
   });
-  mainWindow.webContents.on("context-menu",(event,params) => require('./app/contextmenu').contextMenu(event,params));
+  mainWindow.webContents.on("context-menu",(event,params) =>
+      require('./app/contextmenu').contextMenu(event,params));
 
 
   // and load the index.html of the app.
-  mainWindow.loadURL('https://feedly.com/i/latest');
+  mainWindow.loadURL('https://feedly.com/i/latest').then();
   mainWindow.webContents.on("did-finish-load", function() {
     // let scrollBarCSS = fs.readFileSync(path.join(__dirname,'./css/scrollbar.css')).toString();
     // mainWindow.webContents.insertCSS(scrollBarCSS)
     const scrollBarJS = fs.readFileSync(path.join(__dirname, './js/scrollbar.js')).toString();
-    mainWindow.webContents.executeJavaScript(scrollBarJS);
+    mainWindow.webContents.executeJavaScript(scrollBarJS).then();
   });
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   });
-
-
 
   // https://newsn.net/say/electron-browserwindow-size.html
   mainWindow.webContents.on('new-window',function(event, url, frameName, disposition, options){
@@ -54,22 +52,26 @@ function createWindow(options) {
           preload: path.join(__dirname, 'preload.js'),
           nodeIntegration:true,
         },
-        parent: mainWindow,
-        modal: true,
+        // parent: mainWindow,
+        // modal: true,
+        // maximizable: false,
+        // maxHeight: 600,
+        // maxWidth:1200
       });
-      childWindow.webContents.on("context-menu",(event,params) => require('./app/contextmenu').contextMenu(event,params));
+      childWindow.webContents.on("context-menu",(event,params) =>
+          require('./app/contextmenu').contextMenu(event,params));
 
       childWindow.once('ready-to-show', () => {
         childWindow.show()
       });
       if (!options.webContents) {
-        childWindow.loadURL(url) // existing webContents will be navigated automatically
+        childWindow.loadURL(url).then() // existing webContents will be navigated automatically
       }
       childWindow.webContents.on("did-finish-load", ()=> {
         // let scrollBarCSS = fs.readFileSync(path.join(__dirname,'./css/scrollbar.css')).toString();
         // childWindow.webContents.insertCSS(scrollBarCSS);
         const scrollBarJS = fs.readFileSync(path.join(__dirname, './js/scrollbar.js')).toString();
-        childWindow.webContents.executeJavaScript(scrollBarJS);
+        childWindow.webContents.executeJavaScript(scrollBarJS).then();
       });
 
       event.newGuest = childWindow;
@@ -98,93 +100,15 @@ function createWindow(options) {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-let template = [
-  {
-    label: 'feedly',
-    submenu: [
-      {
-        label:'home',
-        accelerator: 'Alt+Home',
-        click:function () {
-          for(let childWindow of mainWindow.getChildWindows()){
-            childWindow.destroy()
-          }
-          mainWindow.loadURL('https://feedly.com/i/latest')
-        }
-      }, {
-        label: 'minimize',
-        accelerator: 'CmdOrCtrl+M',
-        role: 'minimize'
-      }, {
-        label: 'exit',
-        accelerator: 'CmdOrCtrl+W',
-        click: function () {
-          mainWindow.destroy()
-        }
-      }
-    ]
-  },
-  {
-    label:'View',
-    submenu: [
-        { label: 'reload',
-          accelerator: 'CmdOrCtrl+R',
-          click: function (_, focusedWindow) {
-          if (focusedWindow) {
-            if (focusedWindow.id === 1) {
-            BrowserWindow.getAllWindows().forEach(function (win) {
-            if (win.id > 1) {
-              win.close()
-            }
-            })
-            }
-            focusedWindow.reload()
-          }
-        }
-        },{
-      label:'go forward',
-        accelerator: 'Alt+Right',
-        click:function (_,focusedWindow) {
-          let contents = focusedWindow.webContents;
-          contents.goForward()
-        }
-      },{
-        label:'go back',
-        accelerator: 'Alt+Left',
-        click:function (_,focusedWindow) {
-          let contents = focusedWindow.webContents;
-          contents.goBack()
-        }
-      }
-        ]
-  }, {
-    label: 'about',
-    submenu: [
-      {
-        label: 'github',
-        click: function (){
-          shell.openExternal('https://github.com/Asutorufa/electron-feedly')
-        }
-      },{
-      label: 'author: Asutorufa',
-        click: function () {
-          shell.openExternal('https://github.com/Asutorufa')
-        }
-      },{
-        label: 'version: 1.0.0'
-      }
-
-    ]
-  }
-];
 
 let tray = null;
 app.on('ready', ()=>{
-  let n =new Notification({
+  new Notification({
     title:"welcome",
     body:"organize, read and share what matters to you."
-  });
-  n.show();
+  }).show();
+
+  // Tray Icon
   tray = new Tray(path.join(__dirname, 'build/icons/feedly.png'));
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -204,7 +128,85 @@ app.on('ready', ()=>{
   ]);
   tray.setToolTip('feedly');
   tray.setContextMenu(contextMenu);
-  let menu = Menu.buildFromTemplate(template);
+
+  // Application Menu
+  let menu = Menu.buildFromTemplate([
+    {
+      label: 'feedly',
+      submenu: [
+        {
+          label:'home',
+          accelerator: 'Alt+Home',
+          click:function () {
+            for(let childWindow of mainWindow.getChildWindows()){
+              childWindow.destroy()
+            }
+            mainWindow.loadURL('https://feedly.com/i/latest').then()
+          }
+        }, {
+          label: 'minimize',
+          accelerator: 'CmdOrCtrl+M',
+          role: 'minimize'
+        }, {
+          label: 'exit',
+          accelerator: 'CmdOrCtrl+W',
+          click: function () {
+            mainWindow.destroy()
+          }
+        }
+      ]
+    },
+    {
+      label:'View',
+      submenu: [
+        { label: 'reload',
+          accelerator: 'CmdOrCtrl+R',
+          click: function (_, focusedWindow) {
+            if (focusedWindow) {
+              if (focusedWindow.id === 1) {
+                BrowserWindow.getAllWindows().forEach(function (win) {
+                  if (win.id > 1) {
+                    win.close()
+                  }
+                })
+              }
+              focusedWindow.reload()
+            }
+          }
+        },{
+          label:'go forward',
+          accelerator: 'Alt+Right',
+          click:function (_,focusedWindow) {
+            focusedWindow.webContents.goForward()
+          }
+        },{
+          label:'go back',
+          accelerator: 'Alt+Left',
+          click:function (_,focusedWindow) {
+            focusedWindow.webContents.goBack()
+          }
+        }
+      ]
+    }, {
+      label: 'about',
+      submenu: [
+        {
+          label: 'github',
+          click: function (){
+            shell.openExternal('https://github.com/Asutorufa/electron-feedly').then()
+          }
+        },{
+          label: 'author: Asutorufa',
+          click: function () {
+            shell.openExternal('https://github.com/Asutorufa').then()
+          }
+        },{
+          label: 'version: 1.0.0'
+        }
+
+      ]
+    }
+  ]);
   Menu.setApplicationMenu(menu);
 });
 app.on('ready',createWindow);
