@@ -20,16 +20,21 @@
       "./main.js"
     ],
     "linux": {
-      "category": "internet",
+      "category": "Network",
       "packageCategory": "internet",
       "icon": "build/icons",
       "description": "feedly client",
       "target": [
         "AppImage"
       ],
-      "maintainer": "asutorufa",
-      "artifactName": "${productName}-${version}-${arch}.${ext}"
-    }
+      "desktop": {
+        "Name": "electronFeedly",
+        "Icon": "build/icons/feedly.svg",
+        "Comment": "organize, read and share what matters to you."
+      }
+    },
+    "maintainer": "asutorufa",
+    "artifactName": "${productName}-${version}-${arch}.${ext}"
   },
   "author": "GitHub",
   "license": "CC0-1.0",

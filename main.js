@@ -1,5 +1,5 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow,Menu, Tray,shell} = require('electron');
+const {app, BrowserWindow,Menu,MenuItem, Tray,shell,clipboard,dialog,Notification} = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -7,7 +7,7 @@ const fs = require('fs');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
-function createWindow () {
+function createWindow(options) {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     // transparent: true,
@@ -17,10 +17,12 @@ function createWindow () {
     icon: path.join(__dirname, 'build/icons/'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: false,
+      // preload: path.join(__dirname,"./app/contextmenu.js"),
+      nodeIntegration: true,
       nativeWindowOpen: true
     }
   });
+  mainWindow.webContents.on("context-menu",(event,params) => require('./app/contextmenu').contextMenu(event,params));
 
 
   // and load the index.html of the app.
@@ -39,8 +41,8 @@ function createWindow () {
 
 
   // https://newsn.net/say/electron-browserwindow-size.html
-  mainWindow.webContents.on('new-window',function(event, url, fname, disposition, options){
-    console.log(fname,url,disposition);
+  mainWindow.webContents.on('new-window',function(event, url, frameName, disposition, options){
+    // console.log(fname,url,disposition);
     // if((!url.match("feedly.com\\/v3\\/auth\\/auth\\?client\\_id=feedly.*&mode=login")) && (!url.match("login-callback"))) {
       event.preventDefault();
       let childWindow = new BrowserWindow({
@@ -50,12 +52,13 @@ function createWindow () {
         webContents: options.webContents, // use existing webContents if provided
         webPreferences: {
           preload: path.join(__dirname, 'preload.js'),
-          nodeIntegration:false,
+          nodeIntegration:true,
         },
         parent: mainWindow,
         modal: true,
       });
-      childWindow.opener = mainWindow;
+      childWindow.webContents.on("context-menu",(event,params) => require('./app/contextmenu').contextMenu(event,params));
+
       childWindow.once('ready-to-show', () => {
         childWindow.show()
       });
@@ -80,12 +83,6 @@ function createWindow () {
     event.preventDefault();
     mainWindow.hide();
   });
-
-  // mainWindow.on('focus',function () {
-  //   for(let childWindow of mainWindow.getChildWindows()){
-  //     childWindow.destroy()
-  //   }
-  // });
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -183,6 +180,11 @@ let template = [
 
 let tray = null;
 app.on('ready', ()=>{
+  let n =new Notification({
+    title:"welcome",
+    body:"organize, read and share what matters to you."
+  });
+  n.show();
   tray = new Tray(path.join(__dirname, 'build/icons/feedly.png'));
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -203,7 +205,7 @@ app.on('ready', ()=>{
   tray.setToolTip('feedly');
   tray.setContextMenu(contextMenu);
   let menu = Menu.buildFromTemplate(template);
-  Menu.setApplicationMenu(menu)
+  Menu.setApplicationMenu(menu);
 });
 app.on('ready',createWindow);
 
