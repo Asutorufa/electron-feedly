@@ -17,6 +17,9 @@
     "asar": true,
     "files": [
       "./build/**/*",
+      "./js/*",
+      "./css/*",
+      "./app/*",
       "./main.js"
     ],
     "linux": {
@@ -31,13 +34,13 @@
         "Name": "electronFeedly",
         "Icon": "build/icons/feedly.svg",
         "Comment": "organize, read and share what matters to you."
-      }
+      },
+      "maintainer": "${author}"
     },
-    "maintainer": "asutorufa",
     "artifactName": "${productName}-${version}-${arch}.${ext}"
   },
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "author": "asutorufa",
+  "license": "BSD 2-Clause Simplified",
   "devDependencies": {
     "electron": "^3.0.7",
     "electron-builder": "^21.2.0"
