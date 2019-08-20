@@ -3,11 +3,31 @@ const {app, BrowserWindow,Menu,Tray,shell,Notification} = require('electron');
 const path = require('path');
 const fs = require('fs');
 
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
 function createWindow() {
+  const gotTheLock = app.requestSingleInstanceLock();
+  if (!gotTheLock) {
+    app.quit()
+  } else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+      if (mainWindow) {
+        if (mainWindow.isMinimized()) mainWindow.restore();
+        if(!mainWindow.isVisible()) mainWindow.show();
+        mainWindow.focus()
+      }
+    });
+
+    // https://newsn.net/say/electron-second-instance.html
+    new Notification({
+      title:"welcome",
+      body:"organize, read and share what matters to you."
+    }).show();
+    app.on('ready', createWindow)
+  }
   // Create the browser window.
   mainWindow = new BrowserWindow({
     // transparent: true,
@@ -103,11 +123,6 @@ function createWindow() {
 
 let tray = null;
 app.on('ready', ()=>{
-  new Notification({
-    title:"welcome",
-    body:"organize, read and share what matters to you."
-  }).show();
-
   // Tray Icon
   tray = new Tray(path.join(__dirname, 'build/icons/feedly.png'));
   const contextMenu = Menu.buildFromTemplate([
