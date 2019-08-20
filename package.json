@@ -23,14 +23,15 @@
       "./main.js"
     ],
     "linux": {
+      "icon":"build/icons",
       "category": "Network",
-      "packageCategory": "internet",
+      "packageCategory": "Network",
       "description": "feedly client",
       "target": [
         "AppImage"
       ],
       "desktop": {
-        "Name": "electronFeedly",
+        "Name": "ElectronFeedly",
         "Comment": "organize, read and share what matters to you."
       },
       "maintainer": "${author}"

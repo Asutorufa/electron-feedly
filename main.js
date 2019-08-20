@@ -54,9 +54,10 @@ function createWindow() {
     mainWindow.webContents.executeJavaScript(scrollBarJS).then();
   });
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  });
+
+  // mainWindow.on('ready-to-show', () => {
+  //   mainWindow.show()
+  // });
 
   // https://newsn.net/say/electron-browserwindow-size.html
   mainWindow.webContents.on('new-window',function(event, url, frameName, disposition, options){
@@ -93,7 +94,6 @@ function createWindow() {
         const scrollBarJS = fs.readFileSync(path.join(__dirname, './js/scrollbar.js')).toString();
         childWindow.webContents.executeJavaScript(scrollBarJS).then();
       });
-
       event.newGuest = childWindow;
     // }
   });
