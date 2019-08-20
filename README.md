@@ -2,7 +2,7 @@
 ![GitHub top language](https://img.shields.io/github/languages/top/asutorufa/electron-feedly)
 [![GitHub license](https://img.shields.io/github/license/Asutorufa/electron-feedly)](https://github.com/Asutorufa/electron-feedly/blob/master/LICENSE)  
 A simple electron feedly client ,just use electron to make feedly web like a client.  
-- downlad: [release](https://github.com/Asutorufa/electron-feedly/releases)  
+- download: [release](https://github.com/Asutorufa/electron-feedly/releases)  
 - build:
 
 ```shell
