@@ -1,33 +1,91 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow,Menu,Tray,shell,Notification} = require('electron');
+const {app, BrowserWindow,Menu,Tray,shell,Notification,dialog} = require('electron');
 const path = require('path');
 const fs = require('fs');
 
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+let mainWindow = null;
+let tray = null;
 
-function createWindow() {
-  const gotTheLock = app.requestSingleInstanceLock();
-  if (!gotTheLock) {
-    app.quit()
-  } else {
-    app.on('second-instance', (event, commandLine, workingDirectory) => {
-      if (mainWindow) {
-        if (mainWindow.isMinimized()) mainWindow.restore();
-        if(!mainWindow.isVisible()) mainWindow.show();
-        mainWindow.focus()
-      }
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      if(!mainWindow.isVisible()) mainWindow.show();
+      mainWindow.focus()
+    }
+  });
+
+  // https://newsn.net/say/electron-second-instance.html
+  // This method will be called when Electron has finished
+  // initialization and is ready to create browser windows.
+  // Some APIs can only be used after this event occurs.
+  app.on('ready',createMenu);
+  app.on('ready', createWindow);
+  app.on('web-contents-created',(_,webContent)=>{
+    webContent.on("context-menu",(event,params) => require('./app/contextmenu').contextMenu(event,params));
+    webContent.on('dom-ready',()=>{
+      let scrollBarCSS = fs.readFileSync(path.join(__dirname,'./css/scrollbar.css')).toString();
+      webContent.insertCSS(scrollBarCSS);
+    });
+  });
+  app.on('browser-window-created',(_,browserWindow)=>{
+    // let loadingWindow;
+    // console.log(browserWindow.isModal());
+    // if (browserWindow.isModal() !== true) {
+    //   loadingWindow = new BrowserWindow({
+    //     // transparent: true,
+    //     // frame: false,
+    //     width: 50,
+    //     height: 50,
+    //     webPreferences: {
+    //       preload: path.join(__dirname, 'preload.js'),
+    //       // nodeIntegration: true,
+    //       nativeWindowOpen: true
+    //     },
+    //     parent: browserWindow,
+    //     modal:true
+    //   });
+    //   loadingWindow.loadFile('index.html').then();
+    //   loadingWindow.show();
+    //   browserWindow.webContents.on("page-favicon-updated",()=>{
+    //     console.log("frame finished");
+    //     loadingWindow.destroy()
+    //   })
+    // }
+    browserWindow.on('ready-to-show', () => {
+      browserWindow.show()
     });
 
-    // https://newsn.net/say/electron-second-instance.html
-    new Notification({
-      title:"welcome",
-      body:"organize, read and share what matters to you."
-    }).show();
-    app.on('ready', createWindow)
-  }
+    // Emitted when the window is closed.
+    browserWindow.on('closed', function () {
+      // Dereference the window object, usually you would store windows
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
+      browserWindow = null
+    })
+  });
+
+  // Quit when all windows are closed.
+  app.on('window-all-closed', function () {
+    // On macOS it is common for applications and their menu bar
+    // to stay active until the user quits explicitly with Cmd + Q
+    if (process.platform !== 'darwin') app.quit()
+  });
+
+  app.on('activate', function () {
+    // On macOS it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (mainWindow === null) createWindow()
+  });
+}
+
+function createWindow() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     // transparent: true,
@@ -37,92 +95,46 @@ function createWindow() {
     icon: path.join(__dirname, 'build/icons/icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
+      // nodeIntegration: true,
       nativeWindowOpen: true
     }
   });
-  mainWindow.webContents.on("context-menu",(event,params) =>
-      require('./app/contextmenu').contextMenu(event,params));
-
 
   // and load the index.html of the app.
   mainWindow.loadURL('https://feedly.com/i/latest').then();
-  mainWindow.webContents.on("did-finish-load", function() {
-    // let scrollBarCSS = fs.readFileSync(path.join(__dirname,'./css/scrollbar.css')).toString();
-    // mainWindow.webContents.insertCSS(scrollBarCSS)
-    const scrollBarJS = fs.readFileSync(path.join(__dirname, './js/scrollbar.js')).toString();
-    mainWindow.webContents.executeJavaScript(scrollBarJS).then();
-  });
-
-
-  // mainWindow.on('ready-to-show', () => {
-  //   mainWindow.show()
-  // });
 
   // https://newsn.net/say/electron-browserwindow-size.html
   mainWindow.webContents.on('new-window',function(event, url, frameName, disposition, options){
-    // console.log(fname,url,disposition);
-    // if((!url.match("feedly.com\\/v3\\/auth\\/auth\\?client\\_id=feedly.*&mode=login")) && (!url.match("login-callback"))) {
       event.preventDefault();
       let childWindow = new BrowserWindow({
-        // transparent: true,
         width: 1100,
         height: 700,
         webContents: options.webContents, // use existing webContents if provided
         webPreferences: {
           preload: path.join(__dirname, 'preload.js'),
-          nodeIntegration:true,
+          nativeWindowOpen: true,
+          // nodeIntegration:true,
         },
-        // parent: mainWindow,
-        // modal: true,
-        // maximizable: false,
-        // maxHeight: 600,
-        // maxWidth:1200
-      });
-      childWindow.webContents.on("context-menu",(event,params) =>
-          require('./app/contextmenu').contextMenu(event,params));
-
-      childWindow.once('ready-to-show', () => {
-        childWindow.show()
       });
       if (!options.webContents) {
         childWindow.loadURL(url).then() // existing webContents will be navigated automatically
       }
-      childWindow.webContents.on("did-finish-load", ()=> {
-        // let scrollBarCSS = fs.readFileSync(path.join(__dirname,'./css/scrollbar.css')).toString();
-        // childWindow.webContents.insertCSS(scrollBarCSS);
-        const scrollBarJS = fs.readFileSync(path.join(__dirname, './js/scrollbar.js')).toString();
-        childWindow.webContents.executeJavaScript(scrollBarJS).then();
-      });
       event.newGuest = childWindow;
-    // }
   });
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  // mainWindow.webContents.openDevTools();
 
   mainWindow.on('close',function (event) {
     event.preventDefault();
     mainWindow.hide();
   });
-
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null
-  })
 }
 
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and require them here.
 
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-
-let tray = null;
-app.on('ready', ()=>{
+function createMenu() {
   // Tray Icon
   tray = new Tray(path.join(__dirname, 'build/icons/feedly.png'));
   const contextMenu = Menu.buildFromTemplate([
@@ -223,21 +235,4 @@ app.on('ready', ()=>{
     }
   ]);
   Menu.setApplicationMenu(menu);
-});
-app.on('ready',createWindow);
-
-// Quit when all windows are closed.
-app.on('window-all-closed', function () {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') app.quit()
-});
-
-app.on('activate', function () {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) createWindow()
-});
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+}

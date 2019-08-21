@@ -54,14 +54,14 @@ function contextMenu(event, params) {
     if (params.selectionText) {
         menu.append(new MenuItem({
             label: 'copy',
-            // role: 'copy',
-            click: function (_, focusWindow) {
-                focusWindow.webContents.copy();
-                new Notification({
-                    title: "copy",
-                    body: "copy TEXT: " + params.selectionText
-                }).show();
-            }
+            role: 'copy'
+            // click: function (_, focusWindow) {
+            //     focusWindow.webContents.copy();
+            //     // new Notification({
+            //     //     title: "copy",
+            //     //     body: "copy TEXT: " + params.selectionText
+            //     // }).show();
+            // }
         }));
     }
     menu.append(new MenuItem({
