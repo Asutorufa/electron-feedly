@@ -25,13 +25,13 @@ if (!gotTheLock) {
   // This method will be called when Electron has finished
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
-  app.on('ready',createMenu);
+  app.on("ready",createMenu);
   app.on('ready', createWindow);
   app.on('web-contents-created',(_,webContent)=>{
     webContent.on("context-menu",(event,params) => require('./app/contextmenu').contextMenu(event,params));
     webContent.on('dom-ready',()=>{
       let scrollBarCSS = fs.readFileSync(path.join(__dirname,'./css/scrollbar.css')).toString();
-      webContent.insertCSS(scrollBarCSS);
+      webContent.insertCSS(scrollBarCSS).then();
     });
   });
   app.on('browser-window-created',(_,browserWindow)=>{
@@ -101,7 +101,7 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL('https://feedly.com/i/latest').then();
+  mainWindow.loadURL('https://feedly.com/i/latest', {userAgent: 'Chrome'}).then();
 
   // https://newsn.net/say/electron-browserwindow-size.html
   mainWindow.webContents.on('new-window',function(event, url, frameName, disposition, options){
@@ -162,20 +162,20 @@ function createMenu() {
       label: 'feedly',
       submenu: [
         {
-          label:'home',
+          label:'Home',
           accelerator: 'Alt+Home',
           click:function () {
             for(let childWindow of mainWindow.getChildWindows()){
               childWindow.destroy()
             }
-            mainWindow.loadURL('https://feedly.com/i/latest').then()
+            mainWindow.loadURL('https://feedly.com/i/latest', {userAgent: 'Chrome'}).then()
           }
         }, {
-          label: 'minimize',
+          label: 'Minimize',
           accelerator: 'CmdOrCtrl+M',
           role: 'minimize'
         }, {
-          label: 'exit',
+          label: 'Exit',
           accelerator: 'CmdOrCtrl+W',
           click: function () {
             mainWindow.destroy()
@@ -186,7 +186,7 @@ function createMenu() {
     {
       label:'View',
       submenu: [
-        { label: 'reload',
+        { label: 'Reload',
           accelerator: 'CmdOrCtrl+R',
           click: function (_, focusedWindow) {
             if (focusedWindow) {
@@ -201,13 +201,13 @@ function createMenu() {
             }
           }
         },{
-          label:'go forward',
+          label:'Go Forward',
           accelerator: 'Alt+Right',
           click:function (_,focusedWindow) {
             focusedWindow.webContents.goForward()
           }
         },{
-          label:'go back',
+          label:'Go Back',
           accelerator: 'Alt+Left',
           click:function (_,focusedWindow) {
             focusedWindow.webContents.goBack()

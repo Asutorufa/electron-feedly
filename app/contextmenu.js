@@ -14,7 +14,7 @@ function contextMenu(event, params) {
     if (params.srcURL) {
         if (params.hasImageContents) {
             menu.append(new MenuItem({
-                label: "view image",
+                label: "View Image",
                 click: () => {
                     new BrowserWindow({
                         width: 500,
@@ -24,12 +24,12 @@ function contextMenu(event, params) {
                             // nodeIntegration: true,
                             nativeWindowOpen: true
                         },
-                        title: 'view media'
+                        title: 'View Media'
                     }).loadURL(params.srcURL).then();
                 }
             }));
             menu.append(new MenuItem({
-                label: 'copy image',
+                label: 'Copy Image',
                 click: (_, focusWindow) => {
                     focusWindow.webContents.copyImageAt(params.x, params.y);
                     // const request = require('request').defaults({encoding: null});
@@ -45,7 +45,7 @@ function contextMenu(event, params) {
                 }
             }));
             menu.append(new MenuItem({
-                label: "copy image link",
+                label: "Copy Image Link",
                 click: () => {
                     console.log(params.srcURL);
                     clipboard.writeText(params.srcURL);
@@ -53,16 +53,16 @@ function contextMenu(event, params) {
             }));
         }else{
             menu.append(new MenuItem({
-                label: "copy media link",
+                label: "Copy Media Link",
                 click: () => {
                     console.log(params.srcURL);
                     clipboard.writeText(params.srcURL);
                 }
             }));
             menu.append(new MenuItem({
-                label: "download media",
+                label: "Download Media",
                 click: (_, focusWindow) => {
-                    focusWindow.loadURL(params.srcURL);
+                    focusWindow.loadURL(params.srcURL).then();
                 }
             }));
         }
@@ -72,20 +72,20 @@ function contextMenu(event, params) {
         let linkURL = params.linkURL;
         let linkText = params.linkText;
         menu.append(new MenuItem({
-           label:"open the link at External Browser",
+           label:"Open This Link At External Browser",
            click:function () {
                shell.openExternal(linkURL).then();
            }
         }));
         menu.append(new MenuItem({
-                label: "copy link address",
+                label: "Copy Link",
                 click: function () {
                     clipboard.writeText(linkURL);
                 }
             }
         ));
         menu.append(new MenuItem({
-            label: "copy link Text",
+            label: "Copy Link Text",
             click: function () {
                 clipboard.writeText(linkText);
             }
@@ -94,11 +94,11 @@ function contextMenu(event, params) {
 
     if (params.selectionText) {
         menu.append(new MenuItem({
-            label: 'copy',
+            label: 'Copy',
             role: 'copy'
         }));
         menu.append(new MenuItem({
-            label: 'search from google',
+            label: 'Search From Google',
             click:()=>{
                 new BrowserWindow({
                     // transparent: true,
@@ -115,34 +115,35 @@ function contextMenu(event, params) {
         }))
     }
 
-    if(BrowserWindow.getFocusedWindow().webContents.canGoForward()){
-        menu.append(new MenuItem({
-            label: 'go forward',
-            accelerator: 'Alt+Right',
-            click: function (_, focusedWindow) {
-                focusedWindow.webContents.goForward()
-            }
-        }));
-    }
     if(BrowserWindow.getFocusedWindow().webContents.canGoBack()) {
         menu.append(new MenuItem({
-            label: 'go back',
+            label: 'Go Back',
             accelerator: 'Alt+Left',
             click: function (_, focusedWindow) {
                 focusedWindow.webContents.goBack()
             }
         }));
     }
+
+    if(BrowserWindow.getFocusedWindow().webContents.canGoForward()){
+        menu.append(new MenuItem({
+            label: 'Go Forward',
+            accelerator: 'Alt+Right',
+            click: function (_, focusedWindow) {
+                focusedWindow.webContents.goForward()
+            }
+        }));
+    }
     
     menu.append(new MenuItem({
-        label: 'copy this page URL',
+        label: 'Copy This Page\'s URL',
         click: function (_, focusWindow) {
             clipboard.writeText(focusWindow.webContents.getURL());
         }
     }));
-    menu.append(new MenuItem({label: 'select all', role: 'selectall'}));
+    menu.append(new MenuItem({label: "Select All", role: "selectAll"}));
     menu.append(new MenuItem({
-        label: 'refresh',
+        label: 'Refresh',
         click: function (_, focusWindow) {
             focusWindow.reload()
         }

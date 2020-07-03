@@ -23,7 +23,7 @@
       "./main.js"
     ],
     "linux": {
-      "icon":"build/icons",
+      "icon": "build/icons",
       "category": "Network",
       "packageCategory": "Network",
       "description": "feedly client",
@@ -35,7 +35,8 @@
         "Comment": "organize, read and share what matters to you."
       },
       "maintainer": "${author}"
-    },"mac": {
+    },
+    "mac": {
       "icon": "build/icons/icon.png"
     },
     "win": {
@@ -66,12 +67,11 @@
     "artifactName": "${productName}-${version}-${arch}.${ext}"
   },
   "author": "asutorufa",
-  "license": "BSD 2-Clause Simplified",
+  "license": "BSD-2-Clause",
   "devDependencies": {
-    "electron": "^6.0.3",
-    "electron-builder": "^21.2.0"
+    "ajv": "latest",
+    "electron": "latest",
+    "electron-builder": "latest"
   },
-  "dependencies": {
-    "request": "latest"
-  }
+  "dependencies": {}
 }
