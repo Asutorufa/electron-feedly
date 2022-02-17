@@ -69,7 +69,6 @@
   "author": "asutorufa",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "ajv": "latest",
     "electron": "latest",
     "electron-builder": "latest"
   },
