@@ -1,14 +1,16 @@
-const { Menu, MenuItem,  BrowserWindow,clipboard,  Notification,shell,nativeImage} = require('electron');
+const { Menu, MenuItem, BrowserWindow, clipboard, shell } = require('electron');
+const path = require('path');
+const windowOption = require('./window');
 
 function contextMenu(event, params) {
     const menu = new Menu();
     if (params.isEditable) {
-        menu.append(new MenuItem({label: 'undo', role: 'undo'}));
-        menu.append(new MenuItem({label: 'redo', role: 'redo'}));
-        menu.append(new MenuItem({label: 'cut', role: 'cut'}));
-        menu.append(new MenuItem({label: 'paste', role: 'paste'}));
+        menu.append(new MenuItem({ label: 'undo', role: 'undo' }));
+        menu.append(new MenuItem({ label: 'redo', role: 'redo' }));
+        menu.append(new MenuItem({ label: 'cut', role: 'cut' }));
+        menu.append(new MenuItem({ label: 'paste', role: 'paste' }));
         // menu.append(new MenuItem({ role: 'pasteandmatchstyle' }));
-        menu.append(new MenuItem({label: 'delete', role: 'delete'}));
+        menu.append(new MenuItem({ label: 'delete', role: 'delete' }));
     }
 
     if (params.srcURL) {
@@ -19,8 +21,9 @@ function contextMenu(event, params) {
                     new BrowserWindow({
                         width: 500,
                         height: 480,
+                        icon: windowOption.iconPath,
                         webPreferences: {
-                            preload: require('path').join(__dirname, 'preload.js'),
+                            preload: windowOption.preloadJS,
                             // nodeIntegration: true,
                             nativeWindowOpen: true
                         },
@@ -51,7 +54,7 @@ function contextMenu(event, params) {
                     clipboard.writeText(params.srcURL);
                 }
             }));
-        }else{
+        } else {
             menu.append(new MenuItem({
                 label: "Copy Media Link",
                 click: () => {
@@ -72,21 +75,20 @@ function contextMenu(event, params) {
         let linkURL = params.linkURL;
         let linkText = params.linkText;
         menu.append(new MenuItem({
-           label:"Open This Link At External Browser",
-           click:function () {
-               shell.openExternal(linkURL).then();
-           }
+            label: "Open This Link At External Browser",
+            click: function() {
+                shell.openExternal(linkURL).then();
+            }
         }));
         menu.append(new MenuItem({
-                label: "Copy Link",
-                click: function () {
-                    clipboard.writeText(linkURL);
-                }
+            label: "Copy Link",
+            click: function() {
+                clipboard.writeText(linkURL);
             }
-        ));
+        }));
         menu.append(new MenuItem({
             label: "Copy Link Text",
-            click: function () {
+            click: function() {
                 clipboard.writeText(linkText);
             }
         }))
@@ -99,59 +101,49 @@ function contextMenu(event, params) {
         }));
         menu.append(new MenuItem({
             label: 'Search From Google',
-            click:()=>{
-                new BrowserWindow({
-                    // transparent: true,
-                    // frame: false,
-                    width: 1200,
-                    height: 700,
-                    webPreferences: {
-                        preload: require('path').join(__dirname, 'preload.js'),
-                        // nodeIntegration: true,
-                        nativeWindowOpen: true
-                    }
-                }).loadURL("https://www.google.com/search?q=" + params.selectionText).then();
+            click: () => {
+                new windowOption.createWindow().loadURL("https://www.google.com/search?q=" + params.selectionText).then();
             }
         }))
     }
 
-    if(BrowserWindow.getFocusedWindow().webContents.canGoBack()) {
+    if (BrowserWindow.getFocusedWindow().webContents.canGoBack()) {
         menu.append(new MenuItem({
             label: 'Go Back',
             accelerator: 'Alt+Left',
-            click: function (_, focusedWindow) {
+            click: function(_, focusedWindow) {
                 focusedWindow.webContents.goBack()
             }
         }));
     }
 
-    if(BrowserWindow.getFocusedWindow().webContents.canGoForward()){
+    if (BrowserWindow.getFocusedWindow().webContents.canGoForward()) {
         menu.append(new MenuItem({
             label: 'Go Forward',
             accelerator: 'Alt+Right',
-            click: function (_, focusedWindow) {
+            click: function(_, focusedWindow) {
                 focusedWindow.webContents.goForward()
             }
         }));
     }
-    
+
     menu.append(new MenuItem({
         label: 'Copy This Page\'s URL',
-        click: function (_, focusWindow) {
+        click: function(_, focusWindow) {
             clipboard.writeText(focusWindow.webContents.getURL());
         }
     }));
-    menu.append(new MenuItem({label: "Select All", role: "selectAll"}));
+    menu.append(new MenuItem({ label: "Select All", role: "selectAll" }));
     menu.append(new MenuItem({
         label: 'Refresh',
-        click: function (_, focusWindow) {
+        click: function(_, focusWindow) {
             focusWindow.reload()
         }
     }));
     menu.popup({
-        window:this,
-        x:params.x,
-        y:params.y
+        window: this,
+        x: params.x,
+        y: params.y
     });
 }
 
