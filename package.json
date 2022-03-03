@@ -28,7 +28,7 @@
             "packageCategory": "Network",
             "description": "organize, read and share what matters to you.",
             "desktop": {
-                "Name": "ElectronFeedly",
+                "Name": "electron-feedly",
                 "Comment": "organize, read and share what matters to you."
             },
             "maintainer": "${author}"

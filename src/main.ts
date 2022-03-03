@@ -1,7 +1,7 @@
 import { app, BrowserWindow, Tray, shell, Menu } from "electron";
 import * as path from "path";
 import * as fs from "fs";
-import { iconPath, windowOption } from "./window/window";
+import { iconPath, windowOption, preloadJS } from "./window/window";
 import { contextMenu } from "./window/contextmenu";
 
 let mainWindow: BrowserWindow = null;
@@ -78,7 +78,7 @@ function createWindow() {
     height: 700,
     icon: iconPath,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: preloadJS,
       nativeWindowOpen: true,
     },
   });
