@@ -1,0 +1,60 @@
+{
+    "name": "feedly",
+    "version": "1.0.0",
+    "description": "organize, read and share what matters to you.",
+    "scripts": {
+        "build": "tsc && cp -r ./src/public/* ./dist/",
+        "watch": "tsc -w",
+        "lint": "eslint -c .eslintrc --ext .ts ./src",
+        "start": "npm run build && electron ./dist/main.js",
+        "dist": "npm run build && electron-builder"
+    },
+    "main": "main.js",
+    "build": {
+        "appId": "com.asutorufa.electron-feedly",
+        "productName": "electron-feedly",
+        "asar": true,
+        "files": [
+            "package.json",
+            {
+                "from": "./dist/",
+                "to": ".",
+                "filter": ["**/*"]
+            }
+        ],
+        "linux": {
+            "icon": "./dist/icons",
+            "category": "Network",
+            "packageCategory": "Network",
+            "description": "organize, read and share what matters to you.",
+            "desktop": {
+                "Name": "ElectronFeedly",
+                "Comment": "organize, read and share what matters to you."
+            },
+            "maintainer": "${author}"
+        },
+        "win": {
+            "icon": "./dist/icons/icon.ico"
+        },
+        "directories": {
+            "output": "./product"
+        },
+        "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "repository": "https://github.com/Asutorufa/electron-feedly",
+    "keywords": [
+        "Electron",
+        "feedly"
+    ],
+    "author": "asutorufa",
+    "license": "BSD-2-Clause",
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^4.33.0",
+        "@typescript-eslint/parser": "^4.33.0",
+        "electron": "^17.0.1",
+        "electron-builder": "^22.14.13",
+        "electron-packager": "^15.4.0",
+        "eslint": "^7.32.0",
+        "typescript": "^4.5.5"
+    }
+}
