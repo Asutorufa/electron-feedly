@@ -19,7 +19,9 @@
             {
                 "from": "./dist/",
                 "to": ".",
-                "filter": ["**/*"]
+                "filter": [
+                    "**/*"
+                ]
             }
         ],
         "linux": {
@@ -49,8 +51,8 @@
     "author": "asutorufa",
     "license": "BSD-2-Clause",
     "devDependencies": {
-        "@typescript-eslint/eslint-plugin": "^4.33.0",
-        "@typescript-eslint/parser": "^4.33.0",
+        "@typescript-eslint/eslint-plugin": "^5.13.0",
+        "@typescript-eslint/parser": "^5.13.0",
         "electron": "^17.0.1",
         "electron-builder": "^22.14.13",
         "electron-packager": "^15.4.0",

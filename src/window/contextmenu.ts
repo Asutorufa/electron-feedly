@@ -34,22 +34,12 @@ export const contextMenu = (_: Event, params: ContextMenuParams): void => {
                 label: 'Copy Image',
                 click: (_, focusWindow) => {
                     focusWindow.webContents.copyImageAt(params.x, params.y);
-                    // const request = require('request').defaults({encoding: null});
-                    // request.get(params.srcURL, function (error, response, body) {
-                    //     // https://stackoverflow.com/questions/17124053/node-js-get-image-from-web-and-encode-with-base64
-                    //     let imageData;
-                    //     if (!error && response.statusCode === 200) {
-                    //         imageData = "data:" + response.headers["content-type"] +
-                    //             ";base64," + new Buffer(body).toString('base64');
-                    //         clipboard.writeImage(nativeImage.createFromDataURL(imageData));
-                    //     }
-                    // });
                 }
             }));
             menu.append(new MenuItem({
                 label: "Copy Image Link",
                 click: () => {
-                    console.log(params.srcURL);
+                    // console.log(params.srcURL);
                     clipboard.writeText(params.srcURL);
                 }
             }));
@@ -57,7 +47,7 @@ export const contextMenu = (_: Event, params: ContextMenuParams): void => {
             menu.append(new MenuItem({
                 label: "Copy Media Link",
                 click: () => {
-                    console.log(params.srcURL);
+                    // console.log(params.srcURL);
                     clipboard.writeText(params.srcURL);
                 }
             }));

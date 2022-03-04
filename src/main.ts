@@ -94,7 +94,7 @@ function createWindow() {
   // and load the index.html of the app.
   mainWindow.loadURL('https://feedly.com/i/latest').then();
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  // mainWindow.webContents.openDevTools();
 
 
   mainWindow.on('close', (e) => {
