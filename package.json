@@ -53,7 +53,7 @@
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^5.13.0",
         "@typescript-eslint/parser": "^5.13.0",
-        "electron": "^22.3.21",
+        "electron": "^22.3.24",
         "electron-builder": "^23.6.0",
         "electron-packager": "^17.1.1",
         "eslint": "^7.32.0",
